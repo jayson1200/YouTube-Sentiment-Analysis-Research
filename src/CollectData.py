@@ -7,14 +7,26 @@ def main():
     url = "https://www.youtube.com/feed/trending?bp=4gIuCggvbS8wNWpoZxIiUEwzWlE1Q3BOdWxRbUtPUDNJekdsYWN0V1c4dklYX0hFUA%3D%3D"
     browser = webdriver.Chrome(PATH)
     browser.get(url)
+    
 
     
 
     
     newsVideos = []
 
-    for pageElem in browser.find_elements_by_xpath('//*[@id="thumbnail"]'):
-        newVid = Video(pageElem.get_attribute("href"))
+    webVidElems = browser.find_elements_by_xpath('//*[@id="thumbnail"]')
+
+    for pageElem in webVidElems:
+        
+        hrefVal = pageElem.get_attribute("href")
+        if hrefVal == None:
+            continue
+
+        newVid = Video(hrefVal)
+        
+        if newVid.isUsable == False:
+            continue
+        
         newsVideos.append(newVid)
 
         print(newVid)
