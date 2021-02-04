@@ -1,14 +1,15 @@
-
+from datetime import date, datetime
 
 class Entry:
 
-    def __init__(self, sentiment, magnitude, djia, nasdaq, nyse, dateTime):
+    def __init__(self, sentiment, magnitude, djia, nasdaqComp, sp, dateTime):
         self.sentiment = sentiment
         self.magnitude = magnitude
         self.djia = djia
-        self.nasdaq = nasdaq
-        self.nyse = nyse
+        self.nasdaqComp = nasdaqComp
+        self.sp = sp
         self.dateTime = dateTime
+        
 
     def getSentiment(self):
         return self.sentiment
@@ -19,13 +20,17 @@ class Entry:
     def getDJIA(self):
         return self.djia
 
-    def getNASDAQ(self):
-        return self.nasdaq
+    def getNASDAQComp(self):
+        return self.nasdaqComp
     
-    def getNYSE(self):
-        return self.nyse
+    def getSP(self):
+        return self.sp
 
     def getDateTime(self):
         return self.dateTime
+
+    def __str__(self):
+        return " Sentiment: %f \n Magnitude: %f \n DJIA: %f \n NASDAQ Comp: %f \n S&P500: %f \n" % (
+            self.sentiment, self.magnitude, self.djia, self.nasdaqComp, self.sp) + " DateTime: " + str(self.dateTime)
 
         

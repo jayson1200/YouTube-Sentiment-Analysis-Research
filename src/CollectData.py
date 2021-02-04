@@ -1,15 +1,38 @@
 from selenium import webdriver
 from Video import Video
 from google.cloud import language_v1
+from Entry import Entry
+from datetime import datetime
 
-import os 
+import os
+
 
 PATH = "C:\Program Files (x86)\chromedriver.exe"
+# iexAPIKey = os.environ.get("IEXAPIKEY")
 
 def main():
-    url = "https://www.youtube.com/feed/trending?bp=4gIuCggvbS8wNWpoZxIiUEwzWlE1Q3BOdWxRbUtPUDNJekdsYWN0V1c4dklYX0hFUA%3D%3D"
+    print(datetime.now())
+    print(fillNewEntry(test = False))
+
+def fillNewEntry(**kwargs):
+    youtubeURL = "https://www.youtube.com/feed/trending?bp=4gIuCggvbS8wNWpoZxIiUEwzWlE1Q3BOdWxRbUtPUDNJekdsYWN0V1c4dklYX0hFUA%3D%3D"
+    sp500URL = "https://www.google.com/finance/quote/.INX:INDEXSP"
+    djiaURL = "https://www.google.com/finance/quote/.DJI:INDEXDJX"
+    ndaqComp = "https://www.google.com/finance/quote/.IXIC:INDEXNASDAQ"
+
     browser = webdriver.Chrome(PATH)
-    browser.get(url)
+    
+    browser.get(sp500URL)
+    sp500Price = browser.find_element_by_xpath('//*[@id="yDmH0d"]/c-wiz/div/div[3]/main/div[2]/c-wiz/div/div[1]/div[1]/div/div[1]/div[1]/div/div[1]/div/span/div/div').text
+    
+    browser.get(djiaURL)
+    djiaPrice = browser.find_element_by_xpath('//*[@id="yDmH0d"]/c-wiz/div/div[3]/main/div[2]/c-wiz/div/div[1]/div[1]/div/div[1]/div[1]/div/div[1]/div/span/div/div').text
+    
+    browser.get(ndaqComp)
+    ndaqCompPrice = browser.find_element_by_xpath('//*[@id="yDmH0d"]/c-wiz/div/div[3]/main/div[2]/c-wiz/div/div[1]/div[1]/div/div[1]/div[1]/div/div[1]/div/span/div/div').text
+   
+    browser.get(youtubeURL)
+    
 
     client = language_v1.LanguageServiceClient.from_service_account_json("C:\\Users\\jayso\Documents\\YoutubeSentimentKey.json")
 
@@ -21,8 +44,10 @@ def main():
 
     webVidElems = browser.find_elements_by_xpath('//*[@id="thumbnail"]')
 
+
     # For quick test purposes
-    # webVidElems = [webVidElems[0]]
+    if kwargs.get("test") == True:
+        webVidElems = [webVidElems[0]]
 
     for pageElem in webVidElems:
         
@@ -59,7 +84,10 @@ def main():
     print(sentimentResponse.document_sentiment.score)
     print(sentimentResponse.document_sentiment.magnitude)
 
-
+    overallYouTubeSentiment = sentimentResponse.document_sentiment.score
+    overallYouTubeMagnitude = sentimentResponse.document_sentiment.magnitude
+    
+    return Entry(overallYouTubeSentiment, overallYouTubeMagnitude, float(djiaPrice.replace(',','')), float(ndaqCompPrice.replace(',','')), float(sp500Price.replace(',','')), datetime.now())
     
     
 
