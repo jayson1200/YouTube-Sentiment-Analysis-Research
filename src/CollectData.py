@@ -1,18 +1,38 @@
+import time
+import csv
+
 from selenium import webdriver
 from Video import Video
 from google.cloud import language_v1
 from Entry import Entry
 from datetime import datetime
 
-import os
 
 
 PATH = "C:\Program Files (x86)\chromedriver.exe"
-# iexAPIKey = os.environ.get("IEXAPIKEY")
+
 
 def main():
-    print(datetime.now())
-    print(fillNewEntry(test = False))
+    while(True):
+
+        hour = datetime.now().hour
+        if hour >= 4 and hour <= 20:
+
+            minute = datetime.now().minute
+
+            if minute == 30:
+                newEntry = fillNewEntry(test = False)
+
+                newValues = [newEntry.getSentiment(), newEntry.getMagnitude(), 
+                newEntry.getDJIA(),newEntry.getNASDAQComp(),
+                newEntry.getSP(), newEntry.getDateTime()]
+
+                with open('YoutubeData.csv', 'a', newline='') as fd:
+                    writer = csv.writer(fd)
+                    writer.writerow(newValues)
+
+                time.sleep(60)
+
 
 def fillNewEntry(**kwargs):
     youtubeURL = "https://www.youtube.com/feed/trending?bp=4gIuCggvbS8wNWpoZxIiUEwzWlE1Q3BOdWxRbUtPUDNJekdsYWN0V1c4dklYX0hFUA%3D%3D"
@@ -90,15 +110,6 @@ def fillNewEntry(**kwargs):
     return Entry(overallYouTubeSentiment, overallYouTubeMagnitude, float(djiaPrice.replace(',','')), float(ndaqCompPrice.replace(',','')), float(sp500Price.replace(',','')), datetime.now())
     
     
-
-
-
-
-
-
-
-
-
 
 if __name__ == "__main__":
     main()
