@@ -1,4 +1,3 @@
-import datetime
 from selenium import webdriver
 from selenium.webdriver.remote.webelement import WebElement
 import time

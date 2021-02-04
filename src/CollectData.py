@@ -20,7 +20,7 @@ def main():
 
             minute = datetime.now().minute
 
-            if minute == 30:
+            if minute == 30 or minute == 0:
                 newEntry = fillNewEntry(test = False)
 
                 newValues = [newEntry.getSentiment(), newEntry.getMagnitude(), 
@@ -64,6 +64,7 @@ def fillNewEntry(**kwargs):
 
     webVidElems = browser.find_elements_by_xpath('//*[@id="thumbnail"]')
 
+    currentTime = datetime.now()
 
     # For quick test purposes
     if kwargs.get("test") == True:
@@ -102,7 +103,7 @@ def fillNewEntry(**kwargs):
     overallYouTubeSentiment = sentimentResponse.document_sentiment.score
     overallYouTubeMagnitude = sentimentResponse.document_sentiment.magnitude
     
-    return Entry(overallYouTubeSentiment, overallYouTubeMagnitude, float(djiaPrice.replace(',','')), float(ndaqCompPrice.replace(',','')), float(sp500Price.replace(',','')), datetime.now())
+    return Entry(overallYouTubeSentiment, overallYouTubeMagnitude, float(djiaPrice.replace(',','')), float(ndaqCompPrice.replace(',','')), float(sp500Price.replace(',','')), currentTime)
     
     
 
