@@ -87,8 +87,6 @@ def fillNewEntry(**kwargs):
     for i in range(0, len(newsVideos)):
         for j in range(0, len(newsVideos[i].getComments())):
             allVidCommentText += " %s" % newsVideos[i].getComments()[j]
-
-    print(allVidCommentText)
     
     commentDocument = {
         "content" : allVidCommentText,
@@ -100,9 +98,6 @@ def fillNewEntry(**kwargs):
         "document" : commentDocument,
         "encoding_type" : language_v1.EncodingType.UTF8
     })
-
-    print(sentimentResponse.document_sentiment.score)
-    print(sentimentResponse.document_sentiment.magnitude)
 
     overallYouTubeSentiment = sentimentResponse.document_sentiment.score
     overallYouTubeMagnitude = sentimentResponse.document_sentiment.magnitude
