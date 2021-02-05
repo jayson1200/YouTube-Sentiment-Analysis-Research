@@ -1,6 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.remote.webelement import WebElement
 import time
+import os
 
 PATH = "C:\Program Files (x86)\chromedriver.exe"
 
@@ -11,7 +12,7 @@ class Video:
         self.videoURL = videoURL
         self.usable = True
 
-        browser = webdriver.Chrome(PATH)
+        browser = webdriver.Chrome(PATH, service_log_path=os.devnull)
         browser.get(videoURL)
 
         time.sleep(5)
@@ -28,8 +29,8 @@ class Video:
 
             self.howManyComment = 0
 
-            if len(elems) >= 15:
-                self.howManyComments = 15
+            if len(elems) >= 50:
+                self.howManyComments = 50
             else:
                 self.howManyComments = len(elems)
             

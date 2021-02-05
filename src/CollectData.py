@@ -1,11 +1,13 @@
 import time
 import csv
+import os
 
 from selenium import webdriver
 from Video import Video
 from google.cloud import language_v1
 from Entry import Entry
 from datetime import datetime
+from selenium.common.exceptions import StaleElementReferenceException
 
 
 
@@ -21,11 +23,13 @@ def main():
             minute = datetime.now().minute
 
             if minute == 30 or minute == 0:
-                newEntry = fillNewEntry(test = False)
+                newEntry = fillNewEntry(test = True)
 
                 newValues = [newEntry.getSentiment(), newEntry.getMagnitude(), 
                 newEntry.getDJIA(),newEntry.getNASDAQComp(),
-                newEntry.getSP(), newEntry.getDateTime()]
+                newEntry.getSP(), newEntry.getBullETF(), 
+                newEntry.getBearETF(), newEntry.getDateTime(), 
+                newEntry.getFaultyLinks(), newEntry.getCommentsAnalyzed()]
 
                 with open('YoutubeData.csv', 'a', newline='') as fd:
                     writer = csv.writer(fd)
@@ -38,9 +42,11 @@ def fillNewEntry(**kwargs):
     youtubeURL = "https://www.youtube.com/feed/trending?bp=4gIuCggvbS8wNWpoZxIiUEwzWlE1Q3BOdWxRbUtPUDNJekdsYWN0V1c4dklYX0hFUA%3D%3D"
     sp500URL = "https://www.google.com/finance/quote/.INX:INDEXSP"
     djiaURL = "https://www.google.com/finance/quote/.DJI:INDEXDJX"
-    ndaqComp = "https://www.google.com/finance/quote/.IXIC:INDEXNASDAQ"
+    ndaqCompURL = "https://www.google.com/finance/quote/.IXIC:INDEXNASDAQ"
+    bullSPXLURL = "https://www.google.com/finance/quote/SPXL:NYSEARCA?sa=X&ved=2ahUKEwin2vP45dDuAhVPhuAKHZkHAB0Q3ecFMAB6BAgMEBk"
+    bearSPXSURL = "https://www.google.com/finance/quote/SPXS:NYSEARCA?sa=X&ved=2ahUKEwiQ07GW5tDuAhXJX98KHdDyBowQ3ecFMAB6BAgGEBk"
 
-    browser = webdriver.Chrome(PATH)
+    browser = webdriver.Chrome(PATH, service_log_path=os.devnull)
     
     browser.get(sp500URL)
     sp500Price = browser.find_element_by_xpath('//*[@id="yDmH0d"]/c-wiz/div/div[3]/main/div[2]/c-wiz/div/div[1]/div[1]/div/div[1]/div[1]/div/div[1]/div/span/div/div').text
@@ -48,9 +54,17 @@ def fillNewEntry(**kwargs):
     browser.get(djiaURL)
     djiaPrice = browser.find_element_by_xpath('//*[@id="yDmH0d"]/c-wiz/div/div[3]/main/div[2]/c-wiz/div/div[1]/div[1]/div/div[1]/div[1]/div/div[1]/div/span/div/div').text
     
-    browser.get(ndaqComp)
+    browser.get(ndaqCompURL)
     ndaqCompPrice = browser.find_element_by_xpath('//*[@id="yDmH0d"]/c-wiz/div/div[3]/main/div[2]/c-wiz/div/div[1]/div[1]/div/div[1]/div[1]/div/div[1]/div/span/div/div').text
-   
+    
+    browser.get(bullSPXLURL)
+
+    spxlBullPrice = browser.find_element_by_xpath('//*[@id="yDmH0d"]/c-wiz/div/div[3]/main/div[2]/c-wiz/div/div[1]/div[1]/div/div[1]/div[1]/div/div[1]/div/span/div/div').text
+
+    browser.get(bearSPXSURL)
+
+    spxsBearPrice = browser.find_element_by_xpath('//*[@id="yDmH0d"]/c-wiz/div/div[3]/main/div[2]/c-wiz/div/div[1]/div[1]/div/div[1]/div[1]/div/div[1]/div/span/div/div').text
+
     browser.get(youtubeURL)
     
 
@@ -66,13 +80,23 @@ def fillNewEntry(**kwargs):
 
     currentTime = datetime.now()
 
+    howManyUnparsable = 0
+
     # For quick test purposes
     if kwargs.get("test") == True:
-        webVidElems = [webVidElems[0]]
+        webVidElems = [webVidElems[1]]
 
     for pageElem in webVidElems:
-        
-        hrefVal = pageElem.get_attribute("href")
+        #Stale element
+        try:
+            hrefVal = pageElem.get_attribute("href")
+        except StaleElementReferenceException as e:
+            print("Could not get element")
+            print("Moving on")
+            howManyUnparsable += 1
+            continue
+
+
         if hrefVal == None:
             continue
 
@@ -84,10 +108,12 @@ def fillNewEntry(**kwargs):
         newsVideos.append(newVid)
 
     allVidCommentText = ""
+    howManyComments = 0
 
     for i in range(0, len(newsVideos)):
         for j in range(0, len(newsVideos[i].getComments())):
             allVidCommentText += " %s" % newsVideos[i].getComments()[j]
+            howManyComments+=1
     
     commentDocument = {
         "content" : allVidCommentText,
@@ -102,8 +128,16 @@ def fillNewEntry(**kwargs):
 
     overallYouTubeSentiment = sentimentResponse.document_sentiment.score
     overallYouTubeMagnitude = sentimentResponse.document_sentiment.magnitude
+
+    browser.close()
     
-    return Entry(overallYouTubeSentiment, overallYouTubeMagnitude, float(djiaPrice.replace(',','')), float(ndaqCompPrice.replace(',','')), float(sp500Price.replace(',','')), currentTime)
+    newEntry = Entry(overallYouTubeSentiment, overallYouTubeMagnitude, 
+    float(djiaPrice.replace(',','')), float(ndaqCompPrice.replace(',','')), float(sp500Price.replace(',','')), float(spxlBullPrice.replace(',','').replace('$','')), float(spxsBearPrice.replace(',','').replace('$','')), 
+    currentTime, howManyUnparsable, howManyComments)
+    
+    print(newEntry)
+
+    return newEntry 
     
     
 
