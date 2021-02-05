@@ -23,7 +23,7 @@ def main():
             minute = datetime.now().minute
 
             if minute == 30 or minute == 0:
-                newEntry = fillNewEntry(test = True)
+                newEntry = fillNewEntry(test = False)
 
                 newValues = [newEntry.getSentiment(), newEntry.getMagnitude(), 
                 newEntry.getDJIA(),newEntry.getNASDAQComp(),
