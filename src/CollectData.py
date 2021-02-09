@@ -1,6 +1,7 @@
 import time
 import csv
 import os
+import re
 
 from selenium import webdriver
 from Video import Video
@@ -16,6 +17,8 @@ PATH = "C:\Program Files (x86)\chromedriver.exe"
 
 def main():
     while(True):
+        
+        newValues = []
 
         hour = datetime.now().hour
         if hour >= 4 and hour <= 20:
@@ -72,8 +75,6 @@ def fillNewEntry(**kwargs):
 
     docType = language_v1.Document.Type.PLAIN_TEXT
 
-    docLang = "en"
-
     newsVideos = []
 
     webVidElems = browser.find_elements_by_xpath('//*[@id="thumbnail"]')
@@ -84,7 +85,7 @@ def fillNewEntry(**kwargs):
 
     # For quick test purposes
     if kwargs.get("test") == True:
-        webVidElems = [webVidElems[1]]
+        webVidElems = [webVidElems[0], webVidElems[1], webVidElems[2]]
 
     for pageElem in webVidElems:
         #Stale element
@@ -115,16 +116,23 @@ def fillNewEntry(**kwargs):
             allVidCommentText += " %s" % newsVideos[i].getComments()[j]
             howManyComments+=1
     
+   
+    allVidCommentText = removeEmojis(allVidCommentText)
+    # print(allVidCommentText)
+ 
     commentDocument = {
         "content" : allVidCommentText,
         "type_" : docType,
-        "language" : docLang,
     }
+    print(commentDocument["content"])
 
     sentimentResponse = client.analyze_sentiment(request = {
         "document" : commentDocument,
-        "encoding_type" : language_v1.EncodingType.UTF8
+        "encoding_type" : language_v1.EncodingType.UTF16
     })
+
+    overallYouTubeSentiment = 0
+    overallYouTubeMagnitude = 0
 
     overallYouTubeSentiment = sentimentResponse.document_sentiment.score
     overallYouTubeMagnitude = sentimentResponse.document_sentiment.magnitude
@@ -139,7 +147,14 @@ def fillNewEntry(**kwargs):
 
     return newEntry 
     
-    
+def removeEmojis(text):
+    regrex_pattern = re.compile(pattern = "["
+        u"\U0001F600-\U0001F64F"  # emoticons
+        u"\U0001F300-\U0001F5FF"  # symbols & pictographs
+        u"\U0001F680-\U0001F6FF"  # transport & map symbols
+        u"\U0001F1E0-\U0001F1FF"  # flags (iOS)
+                           "]+", flags = re.UNICODE)
+    return regrex_pattern.sub(r'',text)  
 
 if __name__ == "__main__":
     main()
