@@ -2,7 +2,9 @@ import time
 import csv
 import os
 import re
+import requests
 
+from requests import HTTPError
 from selenium import webdriver
 from Video import Video
 from google.cloud import language_v1
@@ -13,7 +15,7 @@ from selenium.common.exceptions import StaleElementReferenceException
 
 
 PATH = "C:\Program Files (x86)\chromedriver.exe"
-
+tdAPIKey = os.environ.get("TDAPIKEY")
 
 def main():
     while(True):
@@ -46,8 +48,8 @@ def fillNewEntry(**kwargs):
     sp500URL = "https://www.google.com/finance/quote/.INX:INDEXSP"
     djiaURL = "https://www.google.com/finance/quote/.DJI:INDEXDJX"
     ndaqCompURL = "https://www.google.com/finance/quote/.IXIC:INDEXNASDAQ"
-    bullSPXLURL = "https://www.google.com/finance/quote/SPXL:NYSEARCA?sa=X&ved=2ahUKEwin2vP45dDuAhVPhuAKHZkHAB0Q3ecFMAB6BAgMEBk"
-    bearSPXSURL = "https://www.google.com/finance/quote/SPXS:NYSEARCA?sa=X&ved=2ahUKEwiQ07GW5tDuAhXJX98KHdDyBowQ3ecFMAB6BAgGEBk"
+    # bullSPXLURL = "https://www.google.com/finance/quote/SPXL:NYSEARCA?sa=X&ved=2ahUKEwin2vP45dDuAhVPhuAKHZkHAB0Q3ecFMAB6BAgMEBk"
+    # bearSPXSURL = "https://www.google.com/finance/quote/SPXS:NYSEARCA?sa=X&ved=2ahUKEwiQ07GW5tDuAhXJX98KHdDyBowQ3ecFMAB6BAgGEBk"
 
     browser = webdriver.Chrome(PATH, service_log_path=os.devnull)
     
@@ -60,13 +62,16 @@ def fillNewEntry(**kwargs):
     browser.get(ndaqCompURL)
     ndaqCompPrice = browser.find_element_by_xpath('//*[@id="yDmH0d"]/c-wiz/div/div[3]/main/div[2]/c-wiz/div/div[1]/div[1]/div/div[1]/div[1]/div/div[1]/div/span/div/div').text
     
-    browser.get(bullSPXLURL)
+    spxsSPXLURL = "https://api.tdameritrade.com/v1/marketdata/quotes?apikey="+tdAPIKey+"&symbol=spxl%2Cspxs" 
+    # browser.get(bullSPXLURL)
 
-    spxlBullPrice = browser.find_element_by_xpath('//*[@id="yDmH0d"]/c-wiz/div/div[3]/main/div[2]/c-wiz/div/div[1]/div[1]/div/div[1]/div[1]/div/div[1]/div/span/div/div').text
+    priceResponse =  requests.get(spxsSPXLURL).json()
 
-    browser.get(bearSPXSURL)
+    spxlBullPrice = priceResponse["SPXL"]["openPrice"] #browser.find_element_by_xpath('//*[@id="yDmH0d"]/c-wiz/div/div[3]/main/div[2]/c-wiz/div/div[1]/div[1]/div/div[1]/div[1]/div/div[1]/div/span/div/div').text
 
-    spxsBearPrice = browser.find_element_by_xpath('//*[@id="yDmH0d"]/c-wiz/div/div[3]/main/div[2]/c-wiz/div/div[1]/div[1]/div/div[1]/div[1]/div/div[1]/div/span/div/div').text
+    # browser.get(bearSPXSURL)
+
+    spxsBearPrice = priceResponse["SPXS"]["openPrice"] #browser.find_element_by_xpath('//*[@id="yDmH0d"]/c-wiz/div/div[3]/main/div[2]/c-wiz/div/div[1]/div[1]/div/div[1]/div[1]/div/div[1]/div/span/div/div').text
 
     browser.get(youtubeURL)
     
@@ -140,7 +145,7 @@ def fillNewEntry(**kwargs):
     browser.close()
     
     newEntry = Entry(overallYouTubeSentiment, overallYouTubeMagnitude, 
-    float(djiaPrice.replace(',','')), float(ndaqCompPrice.replace(',','')), float(sp500Price.replace(',','')), float(spxlBullPrice.replace(',','').replace('$','')), float(spxsBearPrice.replace(',','').replace('$','')), 
+    float(djiaPrice.replace(',','')), float(ndaqCompPrice.replace(',','')), float(sp500Price.replace(',','')), spxlBullPrice, spxsBearPrice, 
     currentTime, howManyUnparsable, howManyComments)
     
     print(newEntry)
