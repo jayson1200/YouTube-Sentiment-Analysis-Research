@@ -23,11 +23,11 @@ def main():
         newValues = []
 
         hour = datetime.now().hour
-        if hour >= 4 and hour <= 20:
+        if True:#hour >= 4 and hour <= 20:
 
             minute = datetime.now().minute
 
-            if minute == 30 or minute == 0:
+            if True: #minute == 30 or minute == 0:
                 newEntry = fillNewEntry(test = False)
 
                 newValues = [newEntry.getSentiment(), newEntry.getMagnitude(), 
@@ -65,7 +65,10 @@ def fillNewEntry(**kwargs):
     spxsSPXLURL = "https://api.tdameritrade.com/v1/marketdata/quotes?apikey="+tdAPIKey+"&symbol=spxl%2Cspxs" 
     # browser.get(bullSPXLURL)
 
-    priceResponse =  requests.get(spxsSPXLURL).json()
+    try:
+        priceResponse =  requests.get(spxsSPXLURL).json()
+    except HTTPError:
+        print("Your SPXL and SPXS values werent recorded")
 
     spxlBullPrice = priceResponse["SPXL"]["openPrice"] #browser.find_element_by_xpath('//*[@id="yDmH0d"]/c-wiz/div/div[3]/main/div[2]/c-wiz/div/div[1]/div[1]/div/div[1]/div[1]/div/div[1]/div/span/div/div').text
 
