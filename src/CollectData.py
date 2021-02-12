@@ -23,11 +23,11 @@ def main():
         newValues = []
 
         hour = datetime.now().hour
-        if True:#hour >= 4 and hour <= 20:
+        if hour >= 4 and hour <= 20:
 
             minute = datetime.now().minute
 
-            if True: #minute == 30 or minute == 0:
+            if minute == 30 or minute == 0:
                 newEntry = fillNewEntry(test = False)
 
                 newValues = [newEntry.getSentiment(), newEntry.getMagnitude(), 
