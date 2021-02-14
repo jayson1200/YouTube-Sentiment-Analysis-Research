@@ -23,17 +23,16 @@ def main():
         newValues = []
 
         hour = datetime.now().hour
-        if hour >= 4 and hour <= 20:
+        if True: #hour >= 4 and hour <= 20:
 
             minute = datetime.now().minute
 
-            if minute == 30 or minute == 0:
-                newEntry = fillNewEntry(test = False)
+            if True: #minute == 30 or minute == 0:
+                newEntry = fillNewEntry(test = True)
 
                 newValues = [newEntry.getSentiment(), newEntry.getMagnitude(), 
                 newEntry.getDJIA(),newEntry.getNASDAQComp(),
-                newEntry.getSP(), newEntry.getBullETF(), 
-                newEntry.getBearETF(), newEntry.getDateTime(), 
+                newEntry.getSP(), newEntry.getDateTime(), 
                 newEntry.getFaultyLinks(), newEntry.getCommentsAnalyzed()]
 
                 with open('YoutubeData.csv', 'a', newline='') as fd:
@@ -62,19 +61,19 @@ def fillNewEntry(**kwargs):
     browser.get(ndaqCompURL)
     ndaqCompPrice = browser.find_element_by_xpath('//*[@id="yDmH0d"]/c-wiz/div/div[3]/main/div[2]/c-wiz/div/div[1]/div[1]/div/div[1]/div[1]/div/div[1]/div/span/div/div').text
     
-    spxsSPXLURL = "https://api.tdameritrade.com/v1/marketdata/quotes?apikey="+tdAPIKey+"&symbol=spxl%2Cspxs" 
+    #spxsSPXLURL = "https://api.tdameritrade.com/v1/marketdata/quotes?apikey="+tdAPIKey+"&symbol=spxl%2Cspxs" 
     # browser.get(bullSPXLURL)
 
-    try:
-        priceResponse =  requests.get(spxsSPXLURL).json()
-    except HTTPError:
-        print("Your SPXL and SPXS values werent recorded")
+    # try:
+    #     priceResponse =  requests.get(spxsSPXLURL).json()
+    # except HTTPError:
+    #     print("Your SPXL and SPXS values werent recorded")
 
-    spxlBullPrice = priceResponse["SPXL"]["openPrice"] #browser.find_element_by_xpath('//*[@id="yDmH0d"]/c-wiz/div/div[3]/main/div[2]/c-wiz/div/div[1]/div[1]/div/div[1]/div[1]/div/div[1]/div/span/div/div').text
+    # spxlBullPrice = priceResponse["SPXL"]["openPrice"] #browser.find_element_by_xpath('//*[@id="yDmH0d"]/c-wiz/div/div[3]/main/div[2]/c-wiz/div/div[1]/div[1]/div/div[1]/div[1]/div/div[1]/div/span/div/div').text
 
     # browser.get(bearSPXSURL)
 
-    spxsBearPrice = priceResponse["SPXS"]["openPrice"] #browser.find_element_by_xpath('//*[@id="yDmH0d"]/c-wiz/div/div[3]/main/div[2]/c-wiz/div/div[1]/div[1]/div/div[1]/div[1]/div/div[1]/div/span/div/div').text
+    # spxsBearPrice = priceResponse["SPXS"]["openPrice"] #browser.find_element_by_xpath('//*[@id="yDmH0d"]/c-wiz/div/div[3]/main/div[2]/c-wiz/div/div[1]/div[1]/div/div[1]/div[1]/div/div[1]/div/span/div/div').text
 
     browser.get(youtubeURL)
     
@@ -148,8 +147,7 @@ def fillNewEntry(**kwargs):
     browser.close()
     
     newEntry = Entry(overallYouTubeSentiment, overallYouTubeMagnitude, 
-    float(djiaPrice.replace(',','')), float(ndaqCompPrice.replace(',','')), float(sp500Price.replace(',','')), spxlBullPrice, spxsBearPrice, 
-    currentTime, howManyUnparsable, howManyComments)
+    float(djiaPrice.replace(',','')), float(ndaqCompPrice.replace(',','')), float(sp500Price.replace(',','')), currentTime, howManyUnparsable, howManyComments)
     
     print(newEntry)
 
