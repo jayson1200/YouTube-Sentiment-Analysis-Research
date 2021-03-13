@@ -23,7 +23,7 @@ def main():
         newValues = []
 
         hour = datetime.now().hour
-        if hour >= 4 and hour <= 20:
+        if hour >= 9 and hour <= 16:
 
             minute = datetime.now().minute
 
