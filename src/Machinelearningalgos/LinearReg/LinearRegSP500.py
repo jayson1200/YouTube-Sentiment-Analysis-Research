@@ -10,8 +10,8 @@ def mda(y_true, y_pred):
 data = pd.read_csv("Sentiment-Price.csv", date_parser = True)
 
 
-trainingData = data[data["DateTime"]<"2021-02-18 9:30:11"].copy()
-testingData = data[data["DateTime"]>="2021-02-18 9:30:11"].copy()
+trainingData = data[data["DateTime"]<"2021-03-01 10:00:09"].copy()
+testingData = data[data["DateTime"]>="2021-03-01 10:00:09"].copy()
     
 
 X = np.array(trainingData.drop(["S&P500Change","DateTime","NASDAQChange","DJIAChange"], axis = 1).values.tolist())

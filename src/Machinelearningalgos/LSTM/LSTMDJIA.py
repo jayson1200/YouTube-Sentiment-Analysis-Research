@@ -15,8 +15,8 @@ from tensorflow.python import training
 data = pd.read_csv("Sentiment-Price.csv", date_parser = True)
 
 
-trainingData = data[data["DateTime"]<"2021-02-18 9:30:11"].copy()
-testingData = data[data["DateTime"]>="2021-02-18 9:30:11"].copy()
+trainingData = data[data["DateTime"]<"2021-03-01 10:00:09"].copy()
+testingData = data[data["DateTime"]>="2021-03-01 10:00:09"].copy()
 
 trainingData = trainingData.drop(["DateTime","NASDAQChange","S&P500Change"], axis =1)
 
@@ -56,7 +56,7 @@ regressor.compile(optimizer="adam", loss=tensorflow.keras.losses.MSE)
 regressor.fit(X_train, y_train, epochs=5, batch_size=16)
 
 
-past2Days = data[data["DateTime"]<"2021-02-18 9:30:11"].copy().tail(3) #testingData.tail(3)
+past2Days = data[data["DateTime"]<"2021-03-01 10:00:09"].copy().tail(3) #testingData.tail(3)
 
 df = past2Days.append(testingData, ignore_index = True)
 df = df.drop(["DateTime","NASDAQChange","S&P500Change"], axis =1)
