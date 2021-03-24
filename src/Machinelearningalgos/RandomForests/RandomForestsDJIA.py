@@ -17,7 +17,7 @@ testingData = data[data["DateTime"]>="2021-03-01 10:00:09"].copy()
 X = np.array(trainingData.drop(["MovemCatSP","DateTime","MovemCatDJIA","MovemCatNAS"], axis = 1).values.tolist())
 y = np.array(trainingData["MovemCatDJIA"].values.tolist())
 
-classifier = RandomForestClassifier()
+classifier = RandomForestClassifier(criterion = "gini")
 
 classifier.fit(X, y)
 
