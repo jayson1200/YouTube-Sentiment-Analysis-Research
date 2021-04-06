@@ -53,13 +53,13 @@ def fillNewEntry(**kwargs):
     browser = webdriver.Chrome(PATH, service_log_path=os.devnull)
     
     browser.get(sp500URL)
-    sp500Price = browser.find_element_by_xpath('//*[@id="yDmH0d"]/c-wiz/div/div[3]/main/div[2]/c-wiz/div/div[1]/div[1]/div/div[1]/div[1]/div/div[1]/div/span/div/div').text
+    sp500Price = browser.find_element_by_xpath('//*[@id="yDmH0d"]/c-wiz/div/div[3]/main/div[2]/c-wiz/div/div[1]/div/div[1]/div[1]/div/div[1]/div/span/div/div').text
     
     browser.get(djiaURL)
-    djiaPrice = browser.find_element_by_xpath('//*[@id="yDmH0d"]/c-wiz/div/div[3]/main/div[2]/c-wiz/div/div[1]/div[1]/div/div[1]/div[1]/div/div[1]/div/span/div/div').text
+    djiaPrice = browser.find_element_by_xpath('//*[@id="yDmH0d"]/c-wiz/div/div[3]/main/div[2]/c-wiz/div/div[1]/div/div[1]/div[1]/div/div[1]/div/span/div/div').text
     
     browser.get(ndaqCompURL)
-    ndaqCompPrice = browser.find_element_by_xpath('//*[@id="yDmH0d"]/c-wiz/div/div[3]/main/div[2]/c-wiz/div/div[1]/div[1]/div/div[1]/div[1]/div/div[1]/div/span/div/div').text
+    ndaqCompPrice = browser.find_element_by_xpath('//*[@id="yDmH0d"]/c-wiz/div/div[3]/main/div[2]/c-wiz/div/div[1]/div/div[1]/div[1]/div/div[1]/div/span/div/div').text
     
     #spxsSPXLURL = "https://api.tdameritrade.com/v1/marketdata/quotes?apikey="+tdAPIKey+"&symbol=spxl%2Cspxs" 
     # browser.get(bullSPXLURL)
